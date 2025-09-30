@@ -12,8 +12,19 @@ SECRET = os.environ.get('CALLBOT_WEBHOOK_SECRET')
 
 @app.route('/start-call', methods=['POST'])
 def start_call():
-    # your code here
-    pass
+    try:
+        data = request.json
+        to_number = data.get('to')
+        webhook_url = data.get('webhook_url')
+        if not to_number or not webhook_url:
+            return jsonify({"error": "Missing 'to' or 'webhook_url'"}), 400
+
+        call_response = make_call(to_number, webhook_url)
+        return jsonify(call_response)
+    except Exception as e:
+        import traceback
+        print(traceback.format_exc())
+        return jsonify({"error": str(e)}), 500
 
 @app.route('/call-events', methods=['POST'])
 def call_events():
